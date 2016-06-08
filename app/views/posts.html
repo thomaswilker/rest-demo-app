@@ -1,0 +1,11 @@
+<div class="jumbotron">
+</div>
+<table class="table table-condensed">
+	<tr ng-repeat="post in posts">
+		<td><input type="text" ng-model="post.title" ng-change="change(post, 'title')" ng-model-options='{ debounce: 1000 }'/></td>
+		<td><input type="text" ng-model="post.created" ng-change="change(post, 'created')" ng-model-options='{ debounce: 1000 }'/></td>
+		<td>
+			<select ng-change="changeLink(post, 'user')" ng-options="(user.firstName + ' ' + user.lastName) for user in users track by user._links.self.href === post.user._links.self.href" ng-model="post.user"></select>
+		</td>
+	</tr>
+</table>
