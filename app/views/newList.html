@@ -1,0 +1,29 @@
+<div class="container">
+	<div class="row">
+		<div class="col-xs-12">
+			<button class="btn btn-clear" ui-sref="home">
+				<span class="glyphicon glyphicon-menu-left" aria-hidden="true"></span>
+			</button>
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-xs-push-2 col-xs-10">
+			<form class="form">
+				<div class="form-group">
+					<label for="title">Listentitel</label> <input type="text"
+						class="form-control" id="title" ng-model="title"
+						placeholder="Listentitel">
+				</div>
+				<div class="form-group">
+					<label for="exampleInputPassword1">Mitglieder</label>
+					<ul class="list-group">
+						<li class="list-group-item">Du</li>
+					</ul>
+				</div>
+				<div class="form-group">
+					<button class="btn btn-success" ng-disabled="title.length < 1" ng-click="createList()">Erstellen</button>
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
