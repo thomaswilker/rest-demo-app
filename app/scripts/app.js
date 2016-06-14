@@ -25,69 +25,52 @@ angular
   })
   .config(function ($urlRouterProvider, $stateProvider) {
     
-	  console.log('start');
 	  $stateProvider
 	  	.state('app', {
-	  		url : '/',
 	  		abstract : true,
 	  		controller : 'AppCtrl',
-	  		template: '<ui-view/>',
-	  		replace : true
+	  		templateUrl : 'views/app.html',
+	  		resolve : {
+	  			Users : function(SpringDataRestAdapter, $http, UserService) {
+	  				return SpringDataRestAdapter.process($http.get('http://localhost:8080/api/users')).then(function(r) {
+	  					var users = r._embeddedItems;
+	  					UserService.current(users.length > 0 ? users[0] : {});
+	  					return users;
+	  				});
+	  			}
+	  		}
 	  	})
-	    .state('app.home', {
+	  	.state('app.home', {
 	      url : '/home',
 	      controller : 'HomeCtrl',
 	      templateUrl : 'views/home.html',
-	    })
-	    .state('app.newList', {
-	      url : '/newList',
-	      controller : 'NewListCtrl',
-	      templateUrl : 'views/newList.html',
-	    })
-	    .state('app.list', {
-	      url : '/list/:url',
-	      controller : 'ListCtrl',
-	      templateUrl : 'views/list.html',
 	    });
 	  
       
     $urlRouterProvider.otherwise('/home');
 	
   })
-  .service('UserService', function(SpringDataRestAdapter, $http, $rootScope) {
-	  
-	  var self = this;
-	  var currentUser = null;
-	  var users = [];
-	  
-	  function loadAllUsers() {
-		  
-		  SpringDataRestAdapter.process($http.get('http://localhost:8080/api/users')).then(function(result) {
-			  users = result._embeddedItems;
-			  $rootScope.$broadcast('usersLoaded', users);
-		  });
-	  }
-	  
-	  this.loadAllUsers = loadAllUsers;
-	  this.currentUser = function(user) {
-		  
-		  if(user) {
-			  currentUser = user;
-			  $rootScope.$broadcast('currentUserChanged', user);
+  .service('UserService', function() {
+	  var user = {};
+	  this.current = function(u) {
+		  if(u) {
+			 user = u; 
 		  } else {
-			  return currentUser;
+			 return user;
 		  }
-		  
-	  };	   
-	  
+	  };
   })
-  .controller('AppCtrl', function(UserService) {
-	  UserService.loadAllUsers();
-  })
-  .controller('HeaderCtrl', function($scope, $rootScope, UserService) {
+  .controller('AppCtrl', function(Users, $scope, selfLink, UserService) {
+	  $scope.selfLink = selfLink;
+	  $scope.users = Users;
 	  
-	  $scope.$on('usersLoaded', function(event, users) {
-		  console.log(users);
-	  });
+	  $scope.$watch(function() { return UserService.current(); } , function(nv, ov) {
+		  if(nv) {
+			  $scope.currentUser = nv;
+		  }
+	  }, true);
 	  
+	  $scope.changeUser = function(u) {
+		  UserService.current(u);
+	  };
   });
